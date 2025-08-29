@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "ExpoGain Chrome Extension",
+  "version": "1.0.0",
+  "description": "A Chrome extension built with React, TypeScript, Vite, and TailwindCSS",
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "ExpoGain"
+  },
+  "permissions": []
+}
