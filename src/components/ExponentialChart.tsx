@@ -255,35 +255,37 @@ export const ExponentialChart: React.FC<ExponentialChartProps> = ({ onClose }) =
       {/* Close button */}
       <button
         onClick={onClose}
+        aria-label="Close"
         style={{
           position: 'absolute',
-          top: -12,
-          right: -12,
-          width: 24,
-          height: 24,
-          backgroundColor: '#ef4444',
-          border: '2px solid white',
-          borderRadius: '50%',
+          top: '12px',
+          right: '12px',
+          width: '32px',
+          height: '32px',
+          border: 'none',
+          borderRadius: '6px',
+          backgroundColor: 'rgba(239, 68, 68, 0.9)',
+          color: 'white',
+          fontSize: '16px',
+          fontWeight: 'bold',
+          cursor: 'pointer',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: 'white',
-          fontSize: '18px',
-          fontWeight: 'bold',
-          cursor: 'pointer',
           zIndex: 10001,
-          transition: 'all 0.2s',
+          transition: 'all 0.2s ease',
+          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = '#dc2626';
-          e.currentTarget.style.transform = 'scale(1.1)';
+          e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 1)';
+          e.currentTarget.style.transform = 'scale(1.05)';
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = '#ef4444';
+          e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.9)';
           e.currentTarget.style.transform = 'scale(1)';
         }}
       >
-        ×
+        ✕
       </button>
 
       {/* Canvas */}
