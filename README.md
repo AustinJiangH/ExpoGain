@@ -1,6 +1,6 @@
 # ExpoGain Chrome Extension
 
-A modern Chrome extension built with React, TypeScript, Vite, and TailwindCSS.
+A modern Chrome extension built with React, TypeScript, Webpack, and TailwindCSS.
 
 ## 🚀 Quick Start
 
@@ -15,10 +15,10 @@ npm install
 npm run build
 
 # Watch for changes and rebuild automatically
-npm run watch
+npm run dev
 
-# Run linting
-npm run lint
+# Clean build directory
+npm run clean
 ```
 
 ### 🔧 Loading Extension in Chrome
@@ -40,13 +40,13 @@ ExpoGain/
 │   └── index.css          # TailwindCSS styles
 ├── build/                 # Built extension files (generated)
 ├── package.json           # Dependencies and scripts
-└── vite.config.ts         # Vite build configuration
+└── webpack.config.js      # Webpack build configuration
 ```
 
 ### 🛠️ Development Workflow
 
 1. **Make changes** to files in the `src/` directory
-2. **Watch mode**: Run `npm run watch` to automatically rebuild on changes
+2. **Watch mode**: Run `npm run dev` to automatically rebuild on changes
 3. **Reload extension**: Go to `chrome://extensions/` and click the reload button on your extension
 4. **Test**: Click the extension icon to see your changes
 
@@ -62,6 +62,6 @@ This creates optimized files in the `build/` directory ready for Chrome Web Stor
 
 - **React 18** - UI framework
 - **TypeScript** - Type safety
-- **Vite** - Fast build tool
+- **Webpack** - Module bundler and build tool
 - **TailwindCSS** - Utility-first CSS framework
 - **Chrome Extension Manifest V3** - Latest extension format
