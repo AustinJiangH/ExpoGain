@@ -30,6 +30,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         popup: resolve(fileURLToPath(new URL('.', import.meta.url)), 'src/popup.html'),
+        content: resolve(fileURLToPath(new URL('.', import.meta.url)), 'src/content.ts'),
       },
       output: {
         entryFileNames: '[name].js',

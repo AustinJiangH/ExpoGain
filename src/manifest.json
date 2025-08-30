@@ -2,10 +2,20 @@
   "manifest_version": 3,
   "name": "ExpoGain Chrome Extension",
   "version": "1.0.0",
-  "description": "A Chrome extension built with React, TypeScript, Vite, and TailwindCSS",
+  "description": "Inject interactive exponential curve visualizations into any webpage",
   "action": {
     "default_popup": "popup.html",
     "default_title": "ExpoGain"
   },
-  "permissions": []
+  "permissions": [
+    "activeTab"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["content.js"],
+      "run_at": "document_end",
+      "all_frames": false
+    }
+  ]
 }
