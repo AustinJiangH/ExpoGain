@@ -59,6 +59,34 @@ npm run build
 
 This creates optimized files in the `build/` directory ready for Chrome Web Store submission.
 
+### 🚀 Release Management
+
+Use the provided Makefile commands for streamlined release management:
+
+```bash
+# Quick release commands (recommended)
+make patch-release    # Create patch version (1.0.0 → 1.0.1)
+make minor-release    # Create minor version (1.0.0 → 1.1.0)
+make major-release    # Create major version (1.0.0 → 2.0.0)
+
+# Manual release workflow
+make build                     # Build the extension
+make tag version=1.2.3        # Create and push git tag
+make create-release version=1.2.3  # Create GitHub release (requires GitHub CLI)
+
+# Other useful commands
+make clean                    # Clean build directory
+make push-release             # Push branch and tags to origin
+make help                     # Show all available commands
+```
+
+#### Release Process:
+1. **Automatic**: Use `make patch-release`, `make minor-release`, or `make major-release`
+2. **Manual**: Build → Tag → Push → Create Release
+3. **GitHub Release**: Automatically creates release with build artifacts (requires [GitHub CLI](https://cli.github.com/))
+
+The release commands will prompt for confirmation and show version changes before proceeding.
+
 ### 🎨 Tech Stack
 
 - **React 18** - UI framework
