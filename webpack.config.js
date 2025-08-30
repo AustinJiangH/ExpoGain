@@ -1,7 +1,6 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = (env, argv) => {
   const isProduction = argv.mode === 'production';
@@ -26,7 +25,10 @@ module.exports = (env, argv) => {
       {
         test: /\.css$/,
         use: [
-          MiniCssExtractPlugin.loader,
+          // Use style-loader for popup to inline CSS, MiniCssExtractPlugin for content
+          {
+            loader: 'style-loader'
+          },
           'css-loader',
           {
             loader: 'postcss-loader',
@@ -54,10 +56,7 @@ module.exports = (env, argv) => {
       chunks: ['popup']
     }),
     
-    // Extract CSS
-    new MiniCssExtractPlugin({
-      filename: '[name].css'
-    }),
+    // Note: CSS is now inlined using style-loader, no separate CSS files
     
     // Copy manifest and other files
     new CopyWebpackPlugin({
@@ -71,17 +70,10 @@ module.exports = (env, argv) => {
   ],
   optimization: {
     splitChunks: {
+      chunks: 'async', // Only split async chunks, not entry chunks
       cacheGroups: {
-        // For popup, create vendor chunk
-        popupVendor: {
-          name: 'vendor',
-          test: /[\\/]node_modules[\\/]/,
-          chunks: (chunk) => chunk.name === 'popup',
-          enforce: true
-        },
-        // Completely disable vendor chunks for content script
         default: false,
-        vendor: false
+        vendors: false
       }
     }
   }
