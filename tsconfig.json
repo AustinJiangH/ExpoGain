@@ -1,26 +1,30 @@
 {
+  // TypeScript compiler configuration for Chrome Extension project
   "compilerOptions": {
-    "target": "ES2020",
-    "useDefineForClassFields": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "module": "ESNext",
-    "skipLibCheck": true,
-    "types": ["chrome"],
+    // Language and Environment
+    "target": "ES2020", // Compile to ES2020 for modern browser support
+    "useDefineForClassFields": true, // Use standard class fields semantics
+    "lib": ["ES2020", "DOM", "DOM.Iterable"], // Include ES2020, DOM, and DOM.Iterable APIs
+    "module": "ESNext", // Use latest module system
+    "skipLibCheck": true, // Skip type checking of declaration files for faster compilation
+    "types": ["chrome"], // Include Chrome extension types
 
-    /* Webpack mode */
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": false,
-    "jsx": "react-jsx",
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
+    // Module Resolution (Webpack compatibility)
+    "moduleResolution": "node", // Use Node.js module resolution
+    "resolveJsonModule": true, // Allow importing JSON files
+    "isolatedModules": true, // Ensure each file can be transpiled independently
+    "noEmit": false, // Allow emitting compiled files
+    "jsx": "react-jsx", // Use new JSX transform (React 17+)
+    "esModuleInterop": true, // Enable ES module interop with CommonJS
+    "allowSyntheticDefaultImports": true, // Allow default imports from modules without default export
 
-    /* Linting */
-    "strict": true,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "noFallthroughCasesInSwitch": true
+    // Code Quality and Linting
+    "strict": true, // Enable all strict type checking options
+    "noUnusedLocals": false, // Allow unused local variables (useful during development)
+    "noUnusedParameters": false, // Allow unused parameters
+    "noFallthroughCasesInSwitch": true // Require break statements in switch cases
   },
+
+  // Include only the src directory for compilation
   "include": ["src"]
 }
