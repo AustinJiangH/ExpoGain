@@ -33,14 +33,15 @@ npm run clean
 
 ```
 ExpoGain/
-├── src/
-│   ├── manifest.json      # Chrome extension manifest
-│   ├── popup.html         # Popup HTML template
-│   ├── popup.tsx          # React popup component
-│   └── index.css          # TailwindCSS styles
+├── src/                   # Source code directory
 ├── build/                 # Built extension files (generated)
+├── node_modules/          # Dependencies (generated)
 ├── package.json           # Dependencies and scripts
-└── webpack.config.js      # Webpack build configuration
+├── package-lock.json      # Lock file for exact dependency versions
+├── webpack.config.js      # Webpack build configuration
+├── tailwind.config.js     # TailwindCSS configuration
+├── tsconfig.json          # TypeScript configuration
+└── postcss.config.js      # PostCSS configuration
 ```
 
 ### 🛠️ Development Workflow
