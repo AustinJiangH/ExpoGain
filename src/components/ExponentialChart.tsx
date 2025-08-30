@@ -10,7 +10,10 @@ export const ExponentialChart: React.FC<ExponentialChartProps> = ({ onClose }) =
   const [isResizing, setIsResizing] = useState(false)
   const [resizeDirection, setResizeDirection] = useState('')
   const [position, setPosition] = useState({ x: 100, y: 100 })
-  const [size, setSize] = useState({ width: 400, height: 400 })
+  const [size, setSize] = useState({ 
+    width: Math.min(window.innerWidth * 0.6, 800), // 60vw with max 800px
+    height: Math.min(window.innerHeight * 0.6, 600) // 60vh with max 600px
+  })
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
   const [resizeStart, setResizeStart] = useState({ x: 0, y: 0, width: 0, height: 0, posX: 0, posY: 0 })
 
@@ -72,7 +75,7 @@ export const ExponentialChart: React.FC<ExponentialChartProps> = ({ onClose }) =
 
     // Draw exponential curve
     ctx.beginPath()
-    ctx.strokeStyle = '#FF6B6B'
+    ctx.strokeStyle = '#3B82F6'
     ctx.lineWidth = 2
 
     // Draw curve with more points for smoothness
