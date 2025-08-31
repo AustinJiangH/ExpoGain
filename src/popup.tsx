@@ -10,11 +10,11 @@ function App() {
   const handleInjectCurve = async () => {
     setStatus('Starting...')
     setError('')
-    
+
     try {
       setStatus('Finding active tab...')
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
-      
+
       if (!tab.id) {
         setError('No active tab found')
         setStatus('Error')
@@ -28,9 +28,9 @@ function App() {
       }
 
       // Check if current page is supported
-      if (tab.url.startsWith('chrome://') || 
-          tab.url.startsWith('chrome-extension://') || 
-          tab.url.startsWith('edge://') || 
+      if (tab.url.startsWith('chrome://') ||
+          tab.url.startsWith('chrome-extension://') ||
+          tab.url.startsWith('edge://') ||
           tab.url.startsWith('about:') ||
           tab.url.startsWith('moz-extension://')) {
         setError('Cannot inject on browser internal pages. Please navigate to a regular website.')
@@ -39,10 +39,10 @@ function App() {
       }
 
       setStatus('Sending message to content script...')
-      
+
       // Simply send message to content script - it will handle everything
       const response = await chrome.tabs.sendMessage(tab.id, { action: 'injectCurve' })
-      
+
       if (response && response.success) {
         setStatus('Injected!')
         setIsInjected(true)
@@ -59,6 +59,96 @@ function App() {
       console.error('ExpoGain Error:', error)
       setError('Content script not found. Make sure you are on a regular website (not chrome:// pages) and try refreshing the page.')
       setStatus('Failed')
+    }
+  }
+
+  const handleTakeScreenshot = async () => {
+    setStatus('Taking screenshot...')
+    setError('')
+
+    let screenshotUrl: string | undefined
+
+    try {
+      setStatus('Capturing visible tab...')
+
+      // Get current window ID
+      const currentWindow = await chrome.windows.getCurrent()
+
+      if (!currentWindow.id) {
+        setError('Cannot access current window')
+        setStatus('Error')
+        return
+      }
+
+      // Take screenshot of visible tab
+      screenshotUrl = await chrome.tabs.captureVisibleTab(currentWindow.id, {
+        format: 'png',
+        quality: 100
+      })
+
+      if (screenshotUrl) {
+        setStatus('Screenshot captured!')
+
+        // Create download link
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
+        const filename = `expogain-screenshot-${timestamp}.png`
+
+        // Download the screenshot
+        const downloadId = await chrome.downloads.download({
+          url: screenshotUrl,
+          filename: filename,
+          saveAs: false // Changed to false to avoid permission issues
+        })
+
+        // Verify download was successful
+        if (downloadId) {
+          console.log('Screenshot download started with ID:', downloadId)
+        } else {
+          throw new Error('Download failed to start')
+        }
+
+        setStatus('Screenshot saved!')
+        setTimeout(() => {
+          setStatus('Ready')
+        }, 2000)
+      } else {
+        setError('Failed to capture screenshot')
+        setStatus('Failed')
+      }
+
+    } catch (error) {
+      console.error('Screenshot Error:', error)
+
+      // Try alternative download method if downloads API fails and we have a screenshot
+      if (screenshotUrl) {
+        try {
+          console.log('Attempting alternative download method...')
+          const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
+          const filename = `expogain-screenshot-${timestamp}.png`
+
+          // Create a temporary link element for download
+          const link = document.createElement('a')
+          link.href = screenshotUrl
+          link.download = filename
+          link.style.display = 'none'
+
+          document.body.appendChild(link)
+          link.click()
+          document.body.removeChild(link)
+
+          setStatus('Screenshot saved (alternative method)!')
+          setTimeout(() => {
+            setStatus('Ready')
+          }, 2000)
+        } catch (fallbackError) {
+          console.error('Alternative download also failed:', fallbackError)
+          setError('Failed to save screenshot. Please try reloading the extension.')
+          setStatus('Failed')
+        }
+      } else {
+        setError('Failed to capture screenshot. Please try again.')
+        setStatus('Failed')
+      }
     }
   }
 
@@ -92,21 +182,40 @@ function App() {
           </div>
         )}
         
-        <button
-          onClick={handleInjectCurve}
-          disabled={isInjected || status === 'Starting...' || status === 'Finding active tab...' || status === 'Injecting script...'}
-          className={`px-6 py-3 rounded-lg font-semibold text-sm transition-all duration-200 w-full ${
-            isInjected
-              ? 'bg-green-500 text-white cursor-not-allowed'
-              : status.includes('...') 
-              ? 'bg-yellow-500 text-white cursor-not-allowed'
-              : 'bg-white text-blue-600 hover:bg-gray-100 hover:scale-105 active:scale-95'
-          }`}
-        >
-          {isInjected ? '✓ Injected!' : 
-           status.includes('...') ? status :
-           'Inject Curve'}
-        </button>
+        {/* Action Buttons */}
+        <div className="space-y-3">
+          <button
+            onClick={handleInjectCurve}
+            disabled={isInjected || status === 'Starting...' || status === 'Finding active tab...' || status === 'Injecting script...'}
+            className={`px-6 py-3 rounded-lg font-semibold text-sm transition-all duration-200 w-full ${
+              isInjected
+                ? 'bg-green-500 text-white cursor-not-allowed'
+                : status.includes('...')
+                ? 'bg-yellow-500 text-white cursor-not-allowed'
+                : 'bg-white text-blue-600 hover:bg-gray-100 hover:scale-105 active:scale-95'
+            }`}
+          >
+            {isInjected ? '✓ Injected!' :
+             status.includes('...') ? status :
+             'Inject Curve'}
+          </button>
+
+          <button
+            onClick={handleTakeScreenshot}
+            disabled={status === 'Taking screenshot...' || status === 'Capturing visible tab...'}
+            className={`px-6 py-3 rounded-lg font-semibold text-sm transition-all duration-200 w-full border-2 ${
+              status === 'Screenshot saved!'
+                ? 'bg-green-500 text-white border-green-500 cursor-not-allowed'
+                : status.includes('screenshot') || status.includes('Capturing')
+                ? 'bg-yellow-500 text-white border-yellow-500 cursor-not-allowed'
+                : 'bg-transparent text-white border-white hover:bg-white hover:text-blue-600 hover:scale-105 active:scale-95'
+            }`}
+          >
+            {status === 'Screenshot saved!' ? '✓ Screenshot Saved!' :
+             status.includes('screenshot') || status.includes('Capturing') ? status :
+             '📸 Take Screenshot'}
+          </button>
+        </div>
       </div>
     </div>
   )
