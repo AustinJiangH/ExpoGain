@@ -93,24 +93,65 @@ function App() {
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
         const filename = `expogain-screenshot-${timestamp}.png`
 
-        // Download the screenshot
-        const downloadId = await chrome.downloads.download({
-          url: screenshotUrl,
-          filename: filename,
-          saveAs: false // Changed to false to avoid permission issues
-        })
+        // Convert data URL to blob for clipboard
+        const response = await fetch(screenshotUrl)
+        const blob = await response.blob()
 
-        // Verify download was successful
-        if (downloadId) {
-          console.log('Screenshot download started with ID:', downloadId)
-        } else {
-          throw new Error('Download failed to start')
+        let clipboardSuccess = false
+
+        // Copy to clipboard
+        try {
+          await navigator.clipboard.write([
+            new ClipboardItem({ [blob.type]: blob })
+          ])
+          clipboardSuccess = true
+          setStatus('Screenshot copied to clipboard!')
+          console.log('Screenshot copied to clipboard successfully')
+        } catch (clipboardError) {
+          console.error('Clipboard copy failed:', clipboardError)
+          setStatus('Screenshot captured (clipboard failed)')
         }
 
-        setStatus('Screenshot saved!')
+        // Download the screenshot (fallback method - always works)
+        try {
+          console.log('Using fallback download method (link-based)')
+
+          // Create a temporary link element for download
+          const link = document.createElement('a')
+          link.href = screenshotUrl
+          link.download = filename
+          link.style.display = 'none'
+
+          // Add to DOM temporarily
+          document.body.appendChild(link)
+
+          // Trigger download
+          link.click()
+
+          // Clean up
+          document.body.removeChild(link)
+
+          console.log('Fallback download triggered for:', filename)
+
+          if (clipboardSuccess) {
+            setStatus('Screenshot downloaded & copied to clipboard!')
+          } else {
+            setStatus('Screenshot downloaded!')
+          }
+        } catch (downloadError) {
+          console.error('Fallback download also failed:', downloadError)
+
+          if (clipboardSuccess) {
+            setStatus('Screenshot copied to clipboard!')
+          } else {
+            setError('Failed to save screenshot')
+            setStatus('Failed')
+          }
+        }
+
         setTimeout(() => {
           setStatus('Ready')
-        }, 2000)
+        }, 3000)
       } else {
         setError('Failed to capture screenshot')
         setStatus('Failed')
@@ -119,10 +160,10 @@ function App() {
     } catch (error) {
       console.error('Screenshot Error:', error)
 
-      // Try alternative download method if downloads API fails and we have a screenshot
+      // Try alternative download method if primary fails
       if (screenshotUrl) {
         try {
-          console.log('Attempting alternative download method...')
+          console.log('Using final fallback download method')
           const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
           const filename = `expogain-screenshot-${timestamp}.png`
 
@@ -136,14 +177,16 @@ function App() {
           link.click()
           document.body.removeChild(link)
 
-          setStatus('Screenshot saved (alternative method)!')
+          console.log('Final fallback download triggered')
+          setStatus('Screenshot downloaded (fallback method)!')
+
           setTimeout(() => {
             setStatus('Ready')
-          }, 2000)
+          }, 3000)
         } catch (fallbackError) {
-          console.error('Alternative download also failed:', fallbackError)
-          setError('Failed to save screenshot. Please try reloading the extension.')
-          setStatus('Failed')
+          console.error('All download methods failed:', fallbackError)
+          setError('Screenshot captured but failed to download. Try copying manually.')
+          setStatus('Screenshot captured')
         }
       } else {
         setError('Failed to capture screenshot. Please try again.')

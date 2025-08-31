@@ -8,8 +8,7 @@
     "default_title": "ExpoGain"
   },
   "permissions": [
-    "activeTab",
-    "downloads"
+    "activeTab"
   ],
   "content_scripts": [
     {
