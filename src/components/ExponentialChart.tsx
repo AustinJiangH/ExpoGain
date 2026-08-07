@@ -1,4 +1,12 @@
 import React, { useRef, useEffect, useState } from 'react'
+import {
+  PanelCloseButton,
+  PanelDragSurface,
+  PanelMark,
+  PanelResizeHandle,
+} from './overlay/PanelChrome'
+import * as overlay from '../styles/overlay'
+import { plotPalette } from '../styles/overlay'
 
 interface ExponentialChartProps {
   onClose: () => void
@@ -57,9 +65,9 @@ export const ExponentialChart: React.FC<ExponentialChartProps> = ({ onClose }) =
     const transformX = (x: number) => ((x - xMin) * displayWidth) / (xMax - xMin)
     const transformY = (y: number) => displayHeight - ((y - yMin) * displayHeight) / (yMax - yMin)
 
-    // Draw axes
+    // Draw axes — hairline silver against the obsidian face
     ctx.beginPath()
-    ctx.strokeStyle = '#666'
+    ctx.strokeStyle = plotPalette.axis
     ctx.lineWidth = 1
 
     // X-axis
@@ -73,10 +81,20 @@ export const ExponentialChart: React.FC<ExponentialChartProps> = ({ onClose }) =
     ctx.lineTo(xAxisX, displayHeight)
     ctx.stroke()
 
-    // Draw exponential curve
+    // Draw exponential curve — brushed silver running into champagne as it
+    // climbs, with a soft bloom so it reads as polished metal, not ink
+    const curveGradient = ctx.createLinearGradient(0, displayHeight, displayWidth, 0)
+    plotPalette.curveStops.forEach((stop, i) => {
+      curveGradient.addColorStop(i / (plotPalette.curveStops.length - 1), stop)
+    })
+
     ctx.beginPath()
-    ctx.strokeStyle = '#3B82F6'
+    ctx.strokeStyle = curveGradient
     ctx.lineWidth = 2
+    ctx.lineJoin = 'round'
+    ctx.lineCap = 'round'
+    ctx.shadowColor = plotPalette.curveBloom
+    ctx.shadowBlur = 10
 
     // Draw curve with more points for smoothness
     const points = 200
@@ -94,8 +112,12 @@ export const ExponentialChart: React.FC<ExponentialChartProps> = ({ onClose }) =
     }
     ctx.stroke()
 
+    // Clear the bloom so it does not bleed onto the grid and labels
+    ctx.shadowColor = 'transparent'
+    ctx.shadowBlur = 0
+
     // Draw grid lines
-    ctx.strokeStyle = '#ddd'
+    ctx.strokeStyle = plotPalette.grid
     ctx.lineWidth = 0.5
     ctx.setLineDash([2, 2])
 
@@ -122,9 +144,9 @@ export const ExponentialChart: React.FC<ExponentialChartProps> = ({ onClose }) =
     }
     ctx.setLineDash([])
 
-    // Add numbers to axes
-    ctx.fillStyle = '#666'
-    ctx.font = '10px Arial'
+    // Add numbers to axes — set in the same serif as the wordmark
+    ctx.fillStyle = plotPalette.label
+    ctx.font = plotPalette.labelFont
     ctx.textAlign = 'center'
     ctx.textBaseline = 'top'
 
@@ -238,195 +260,36 @@ export const ExponentialChart: React.FC<ExponentialChartProps> = ({ onClose }) =
   }, [isDragging, isResizing, dragStart, resizeStart])
 
   return (
-    <div 
+    <div
       style={{
         position: 'fixed',
         left: position.x,
         top: position.y,
         width: size.width,
         height: size.height,
-        border: '2px solid #6b7280',
-        borderRadius: '12px',
-        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-        backgroundColor: 'rgba(255, 255, 255, 0.05)',
         zIndex: 10000,
+        ...overlay.panel,
       }}
     >
+      <PanelMark name="ExpoGain" sub="Exponential Curve" />
+
       {/* Close button */}
-      <button
-        onClick={onClose}
-        aria-label="Close"
-        style={{
-          position: 'absolute',
-          top: '12px',
-          right: '12px',
-          width: '32px',
-          height: '32px',
-          border: 'none',
-          borderRadius: '6px',
-          backgroundColor: 'rgba(239, 68, 68, 0.9)',
-          color: 'white',
-          fontSize: '16px',
-          fontWeight: 'bold',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 10001,
-          transition: 'all 0.2s ease',
-          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 1)';
-          e.currentTarget.style.transform = 'scale(1.05)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.9)';
-          e.currentTarget.style.transform = 'scale(1)';
-        }}
-      >
-        ✕
-      </button>
+      <PanelCloseButton onClose={onClose} />
 
       {/* Canvas */}
-      <canvas
-        ref={canvasRef}
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          borderRadius: '8px',
-          pointerEvents: 'none', // Allow mouse events to pass through
-        }}
-      />
+      <canvas ref={canvasRef} style={overlay.canvas} />
 
       {/* Drag area */}
-      <div
-        style={{
-          position: 'absolute',
-          top: 20,
-          left: 20,
-          right: 20,
-          bottom: 20,
-          cursor: 'move',
-          zIndex: 1, // Ensure it's above the canvas
-        }}
-        onMouseDown={(e) => handleMouseDown(e, 'drag')}
-      />
+      <PanelDragSurface onMouseDown={(e) => handleMouseDown(e, 'drag')} />
 
-      {/* Resize handles - corners */}
-      <div
-        style={{
-          position: 'absolute',
-          top: -6,
-          left: -6,
-          width: 12,
-          height: 12,
-          backgroundColor: '#4b5563',
-          borderRadius: '50%',
-          cursor: 'nw-resize',
-        }}
-        onMouseDown={(e) => handleMouseDown(e, 'resize-nw')}
-      />
-      <div
-        style={{
-          position: 'absolute',
-          top: -6,
-          right: -6,
-          width: 12,
-          height: 12,
-          backgroundColor: '#4b5563',
-          borderRadius: '50%',
-          cursor: 'ne-resize',
-        }}
-        onMouseDown={(e) => handleMouseDown(e, 'resize-ne')}
-      />
-      <div
-        style={{
-          position: 'absolute',
-          bottom: -6,
-          left: -6,
-          width: 12,
-          height: 12,
-          backgroundColor: '#4b5563',
-          borderRadius: '50%',
-          cursor: 'sw-resize',
-        }}
-        onMouseDown={(e) => handleMouseDown(e, 'resize-sw')}
-      />
-      <div
-        style={{
-          position: 'absolute',
-          bottom: -6,
-          right: -6,
-          width: 12,
-          height: 12,
-          backgroundColor: '#4b5563',
-          borderRadius: '50%',
-          cursor: 'se-resize',
-        }}
-        onMouseDown={(e) => handleMouseDown(e, 'resize-se')}
-      />
-
-      {/* Resize handles - edges */}
-      <div
-        style={{
-          position: 'absolute',
-          top: -4,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: 20,
-          height: 8,
-          backgroundColor: '#4b5563',
-          borderRadius: '4px',
-          cursor: 'n-resize',
-        }}
-        onMouseDown={(e) => handleMouseDown(e, 'resize-n')}
-      />
-      <div
-        style={{
-          position: 'absolute',
-          bottom: -4,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: 20,
-          height: 8,
-          backgroundColor: '#4b5563',
-          borderRadius: '4px',
-          cursor: 's-resize',
-        }}
-        onMouseDown={(e) => handleMouseDown(e, 'resize-s')}
-      />
-      <div
-        style={{
-          position: 'absolute',
-          left: -4,
-          top: '50%',
-          transform: 'translateY(-50%)',
-          width: 8,
-          height: 20,
-          backgroundColor: '#4b5563',
-          borderRadius: '4px',
-          cursor: 'w-resize',
-        }}
-        onMouseDown={(e) => handleMouseDown(e, 'resize-w')}
-      />
-      <div
-        style={{
-          position: 'absolute',
-          right: -4,
-          top: '50%',
-          transform: 'translateY(-50%)',
-          width: 8,
-          height: 20,
-          backgroundColor: '#4b5563',
-          borderRadius: '4px',
-          cursor: 'e-resize',
-        }}
-        onMouseDown={(e) => handleMouseDown(e, 'resize-e')}
-      />
+      {/* Resize handles - corners, then edges */}
+      {overlay.resizeHandles.map((handle) => (
+        <PanelResizeHandle
+          key={handle.direction}
+          style={handle.style}
+          onMouseDown={(e) => handleMouseDown(e, `resize-${handle.direction}`)}
+        />
+      ))}
     </div>
   )
 }

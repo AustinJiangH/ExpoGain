@@ -1,0 +1,141 @@
+/* ExpoGain design tokens — "old money": obsidian and graphite grounds, a
+   silver lining, champagne and oxblood as the only accents.
+
+   This file is the single source of colour in the project. Every literal
+   value lives here; components.css and theme.ts compose them and never
+   introduce a colour of their own.
+
+   Tailwind v4 reads @theme and emits every entry as a CSS custom property,
+   so these reach both the component classes and, for the namespaced ones,
+   the utility layer (text-silver-300, shadow-card).
+
+   NOTE: src/styles/theme.ts mirrors these values for the injected overlay,
+   which renders into a host page and so cannot use a stylesheet.
+   Change a value here, change it there. */
+@theme {
+  /* ---- Grounds: near-black through graphite ---- */
+  --color-obsidian-900: #08080a;
+  --color-obsidian-850: #0c0d0f;
+  --color-obsidian-800: #0d0e10;
+  --color-obsidian-700: #17181c;
+  --color-graphite-600: #1e1f23;
+  --color-graphite-500: #2a2b31;
+  --color-graphite-400: #3a3c43;
+  --color-graphite-300: #43454c;
+
+  /* ---- The silver ramp: lining, brushed metal, engraved type ---- */
+  --color-silver-050: #ffffff;
+  --color-silver-075: #f7f8f9;
+  --color-silver-100: #f2f3f5;
+  --color-silver-150: #e9ebee;
+  --color-silver-200: #dfe1e6;
+  --color-silver-250: #d3d7dd;
+  --color-silver-300: #c2c6cd;
+  --color-silver-350: #b3b7be;
+  --color-silver-400: #9296a0;
+  --color-silver-450: #83868e;
+  --color-silver-500: #7e818a;
+  --color-silver-600: #5e616a;
+
+  /* ---- Accents, used sparingly ---- */
+  --color-champagne-400: #c9b072;
+  --color-oxblood-400: #c08a86;
+
+  /* ---- Tints: white at fixed strengths, the only way light is added ---- */
+  --tint-veil: rgb(255 255 255 / 0.02);
+  --tint-raise: rgb(255 255 255 / 0.05);
+  --tint-hairline: rgb(255 255 255 / 0.07);
+  --tint-rim: rgb(255 255 255 / 0.15);
+  --tint-rim-strong: rgb(255 255 255 / 0.35);
+  --tint-sheen: rgb(255 255 255 / 0.05);
+  --tint-highlight: rgb(255 255 255 / 0.22);
+
+  /* ---- Faces: the metal and the card stock ---- */
+  --face-card: linear-gradient(
+    160deg,
+    var(--color-graphite-600) 0%,
+    var(--color-obsidian-850) 48%,
+    var(--color-obsidian-700) 100%
+  );
+  --face-lining: linear-gradient(
+    150deg,
+    var(--color-silver-150) 0%,
+    var(--color-silver-400) 16%,
+    var(--color-graphite-300) 38%,
+    var(--color-graphite-600) 56%,
+    var(--color-silver-600) 78%,
+    var(--color-silver-250) 100%
+  );
+  --face-brushed: linear-gradient(
+    180deg,
+    var(--color-silver-075) 0%,
+    var(--color-silver-200) 42%,
+    var(--color-silver-350) 56%,
+    var(--color-silver-150) 100%
+  );
+  --face-chip: linear-gradient(
+    135deg,
+    var(--color-silver-150) 0%,
+    var(--color-silver-350) 34%,
+    var(--color-silver-450) 58%,
+    var(--color-silver-250) 100%
+  );
+  --face-stud: linear-gradient(
+    180deg,
+    var(--color-silver-150) 0%,
+    var(--color-silver-350) 52%,
+    var(--color-silver-450) 100%
+  );
+  --face-wordmark: linear-gradient(
+    180deg,
+    var(--color-silver-050) 0%,
+    var(--color-silver-250) 38%,
+    var(--color-silver-400) 100%
+  );
+  --face-sheen: linear-gradient(90deg, transparent, var(--tint-sheen), transparent);
+
+  /* The chip's contact grid, etched shallowly into the silver — a few
+     divisions only, the way a real EMV contact plate is scored */
+  --face-chip-grid: repeating-linear-gradient(
+      0deg,
+      transparent 0 8px,
+      rgb(0 0 0 / 0.15) 8px 9px
+    ),
+    repeating-linear-gradient(90deg, transparent 0 13px, rgb(0 0 0 / 0.15) 13px 14px);
+
+  /* ---- Rules: hairlines that fade the way engraving does ---- */
+  --rule-hairline: linear-gradient(
+    90deg,
+    var(--tint-highlight),
+    var(--tint-raise) 65%,
+    transparent
+  );
+
+  /* ---- Elevation ---- */
+  --shadow-card: 0 20px 45px -14px rgb(0 0 0 / 0.95);
+  --shadow-struck: inset 0 1px 0 rgb(255 255 255 / 0.9), inset 0 -1px 0 rgb(0 0 0 / 0.28),
+    0 1px 2px rgb(0 0 0 / 0.5);
+  --shadow-engraved: inset 0 1px 0 var(--tint-raise);
+  --shadow-stud: inset 0 0 0 1px rgb(0 0 0 / 0.45), 0 1px 3px rgb(0 0 0 / 0.6);
+
+  /* ---- Type ---- */
+  --font-display: "Didot", "Bodoni MT", "Hoefler Text", "Baskerville", Garamond, Georgia,
+    "Times New Roman", serif;
+
+  /* Small caps set wide — the register the whole interface speaks in */
+  --tracking-engraved: 0.3em;
+  --tracking-struck: 0.24em;
+
+  /* ---- Geometry ---- */
+  --radius-card: 17px;
+  --radius-lining: 18px;
+  --radius-control: 10px;
+}
+
+@layer base {
+  html,
+  body {
+    background-color: var(--color-obsidian-900);
+    color-scheme: dark;
+  }
+}
