@@ -29,7 +29,7 @@ export function App() {
     <div className="w-80 bg-twilight px-5 py-5">
       {/* Title lockup — left aligned, tagline in place of the old body copy */}
       <header>
-        <h1 className="text-xl font-bold tracking-tight text-eggshell">ExpoGain</h1>
+        <h1 className="text-xl font-bold tracking-tight text-eggshell">Expo Gain Curve</h1>
         <p className="mt-1 text-[11px] text-eggshell/65">Interactive curve overlays</p>
       </header>
 
