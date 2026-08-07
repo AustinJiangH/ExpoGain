@@ -197,68 +197,78 @@ function App() {
 
 
 
-  return (
-    <div className="w-80 h-72 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center p-6">
-      <div className="text-center w-full">
-        <h1 className="text-2xl font-bold text-white mb-4">ExpoGain</h1>
-        <p className="text-white/90 text-sm mb-4">
-          Inject an interactive exponential curve visualization into any webpage
-        </p>
-        
-        {/* Status display */}
-        <div className="mb-4">
-          <div className="text-white/80 text-xs mb-1">Status:</div>
-          <div className={`text-sm font-medium ${
-            status === 'Ready' ? 'text-green-200' :
-            status === 'Failed' || status === 'Error' ? 'text-red-200' :
-            'text-yellow-200'
-          }`}>
-            {status}
-          </div>
-        </div>
-        
-        {/* Error display */}
-        {error && (
-          <div className="mb-4 p-2 bg-red-500/20 rounded border border-red-300/30">
-            <div className="text-red-200 text-xs">Error:</div>
-            <div className="text-red-100 text-xs">{error}</div>
-          </div>
-        )}
-        
-        {/* Action Buttons */}
-        <div className="space-y-3">
-          <button
-            onClick={handleInjectCurve}
-            disabled={isInjected || status === 'Starting...' || status === 'Finding active tab...' || status === 'Injecting script...'}
-            className={`px-6 py-3 rounded-lg font-semibold text-sm transition-all duration-200 w-full ${
-              isInjected
-                ? 'bg-green-500 text-white cursor-not-allowed'
-                : status.includes('...')
-                ? 'bg-yellow-500 text-white cursor-not-allowed'
-                : 'bg-white text-blue-600 hover:bg-gray-100 hover:scale-105 active:scale-95'
-            }`}
-          >
-            {isInjected ? '✓ Injected!' :
-             status.includes('...') ? status :
-             'Inject Curve'}
-          </button>
+  const isInjecting = status.includes('...')
+  const isCapturing = status.includes('screenshot') || status.includes('Capturing')
 
-          <button
-            onClick={handleTakeScreenshot}
-            disabled={status === 'Taking screenshot...' || status === 'Capturing visible tab...'}
-            className={`px-6 py-3 rounded-lg font-semibold text-sm transition-all duration-200 w-full border-2 ${
-              status === 'Screenshot saved!'
-                ? 'bg-green-500 text-white border-green-500 cursor-not-allowed'
-                : status.includes('screenshot') || status.includes('Capturing')
-                ? 'bg-yellow-500 text-white border-yellow-500 cursor-not-allowed'
-                : 'bg-transparent text-white border-white hover:bg-white hover:text-blue-600 hover:scale-105 active:scale-95'
-            }`}
-          >
-            {status === 'Screenshot saved!' ? '✓ Screenshot Saved!' :
-             status.includes('screenshot') || status.includes('Capturing') ? status :
-             '📸 Take Screenshot'}
-          </button>
+  return (
+    <div className="w-80 bg-gradient-to-br from-blue-500 to-purple-600 px-5 py-5">
+      {/* Title lockup — left aligned, tagline in place of the old body copy */}
+      <header>
+        <h1 className="text-xl font-bold tracking-tight text-white">ExpoGain</h1>
+        <p className="mt-1 text-[11px] text-white/70">Interactive curve overlays</p>
+      </header>
+
+      <div className="mt-3.5 h-px bg-white/20" />
+
+      {/* Error display */}
+      {error && (
+        <div className="mt-4 rounded-lg border border-red-300/30 bg-red-500/20 p-2.5">
+          <div className="text-[10px] font-medium uppercase tracking-wide text-red-200">Error</div>
+          <div className="mt-1 text-xs leading-snug text-red-50">{error}</div>
         </div>
+      )}
+
+      {/* Primary action — the one thing this popup is for */}
+      <button
+        onClick={handleInjectCurve}
+        disabled={isInjected || status === 'Starting...' || status === 'Finding active tab...' || status === 'Injecting script...'}
+        className={`group mt-5 flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-3.5 text-[15px] font-semibold transition-all duration-200 ${
+          isInjected
+            ? 'cursor-not-allowed bg-emerald-400 text-emerald-950 shadow-lg shadow-emerald-900/25'
+            : isInjecting
+            ? 'cursor-not-allowed bg-white/25 text-white'
+            : 'bg-white text-blue-600 shadow-lg shadow-blue-900/30 hover:shadow-xl hover:shadow-blue-900/40 hover:brightness-105 active:scale-[0.98]'
+        }`}
+      >
+        {isInjected ? '✓ Injected!' :
+         isInjecting ? status :
+         <>
+           Inject Curve
+           <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-1">→</span>
+         </>}
+      </button>
+
+      {/* Secondary action — present, but plainly not the main event */}
+      <button
+        onClick={handleTakeScreenshot}
+        disabled={status === 'Taking screenshot...' || status === 'Capturing visible tab...'}
+        className={`mt-3 w-full py-1.5 text-center text-xs transition-colors duration-200 ${
+          status === 'Screenshot saved!'
+            ? 'cursor-not-allowed text-emerald-200'
+            : isCapturing
+            ? 'cursor-not-allowed text-yellow-100'
+            : 'text-white/75 underline-offset-4 hover:text-white hover:underline'
+        }`}
+      >
+        {status === 'Screenshot saved!' ? '✓ Screenshot Saved!' :
+         isCapturing ? status :
+         'Take Screenshot'}
+      </button>
+
+      {/* Status — demoted to a quiet footer line */}
+      <div className="mt-4 flex items-center gap-1.5 border-t border-white/15 pt-3">
+        <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${
+          status === 'Ready' ? 'bg-green-300' :
+          status === 'Failed' || status === 'Error' ? 'bg-red-300' :
+          'bg-yellow-300'
+        }`} />
+        <span className={`text-[10px] tracking-wide ${
+          status === 'Ready' ? 'text-green-200' :
+          status === 'Failed' || status === 'Error' ? 'text-red-200' :
+          'text-yellow-200'
+        }`}>
+          {status}
+        </span>
       </div>
     </div>
   )
