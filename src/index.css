@@ -1,5 +1,1 @@
 @import "tailwindcss";
-
-/* Design tokens first — components.css composes them */
-@import "./styles/tokens.css";
-@import "./styles/components.css";
