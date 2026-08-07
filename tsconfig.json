@@ -10,7 +10,7 @@
     "types": ["chrome"], // Include Chrome extension types
 
     // Module Resolution (Webpack compatibility)
-    "moduleResolution": "node", // Use Node.js module resolution
+    "moduleResolution": "bundler", // Resolution semantics for bundlers (TS 7 removed "node"/node10)
     "resolveJsonModule": true, // Allow importing JSON files
     "isolatedModules": true, // Ensure each file can be transpiled independently
     "noEmit": false, // Allow emitting compiled files

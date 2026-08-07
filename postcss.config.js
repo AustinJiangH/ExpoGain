@@ -1,13 +1,11 @@
 // PostCSS configuration for processing CSS files
 // PostCSS is used by webpack to transform CSS with plugins
 
-export default {
+module.exports = {
   plugins: {
-    // Tailwind CSS plugin - processes @tailwind directives and generates utility classes
-    tailwindcss: {},
-
-    // Autoprefixer plugin - automatically adds vendor prefixes to CSS properties
-    // Ensures cross-browser compatibility for CSS features
-    autoprefixer: {},
+    // Tailwind CSS v4 PostCSS plugin - processes @import "tailwindcss"
+    // and generates utility classes. Vendor prefixing is handled internally
+    // by Lightning CSS, so autoprefixer is no longer needed.
+    '@tailwindcss/postcss': {},
   },
 }

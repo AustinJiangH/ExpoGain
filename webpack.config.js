@@ -29,8 +29,15 @@ module.exports = (env, argv) => {
       rules: [
         {
           // Process TypeScript and TSX files
+          // esbuild-loader transpiles only - type checking runs separately via
+          // `npm run typecheck` (tsc --noEmit), which `npm run build` invokes first
           test: /\.tsx?$/,
-          use: 'ts-loader', // Use ts-loader to transpile TypeScript
+          loader: 'esbuild-loader',
+          options: {
+            loader: 'tsx', // Handle both .ts and .tsx with the JSX-aware parser
+            target: 'es2020', // Match the "target" in tsconfig.json
+            tsconfig: './tsconfig.json' // Pick up jsx: "react-jsx" and other settings
+          },
           exclude: /node_modules/ // Exclude node_modules for performance
         },
         {
@@ -49,8 +56,9 @@ module.exports = (env, argv) => {
               options: {
                 postcssOptions: {
                   plugins: [
-                    require('tailwindcss'), // Process Tailwind CSS
-                    require('autoprefixer') // Add vendor prefixes automatically
+                    // Tailwind CSS v4 plugin - also handles vendor prefixing
+                    // via Lightning CSS, so autoprefixer is not required
+                    require('@tailwindcss/postcss')
                   ]
                 }
               }
