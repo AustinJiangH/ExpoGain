@@ -1,1 +1,15 @@
 @import "tailwindcss";
+
+/* Project palette. Tailwind v4 reads @theme and generates the matching
+   utilities, so these are used as bg-twilight, text-eggshell and so on —
+   no hex literals in the markup.
+
+   src/palette.ts mirrors these for the injected chart, which renders into a
+   host page and so must be styled inline. Change one, change the other. */
+@theme {
+  --color-eggshell: #f4f1de;
+  --color-burnt-peach: #e07a5f;
+  --color-twilight: #3d405b;
+  --color-muted-teal: #81b29a;
+  --color-apricot: #f2cc8f;
+}

@@ -201,20 +201,20 @@ function App() {
   const isCapturing = status.includes('screenshot') || status.includes('Capturing')
 
   return (
-    <div className="w-80 bg-gradient-to-br from-blue-500 to-purple-600 px-5 py-5">
+    <div className="w-80 bg-twilight px-5 py-5">
       {/* Title lockup — left aligned, tagline in place of the old body copy */}
       <header>
-        <h1 className="text-xl font-bold tracking-tight text-white">ExpoGain</h1>
-        <p className="mt-1 text-[11px] text-white/70">Interactive curve overlays</p>
+        <h1 className="text-xl font-bold tracking-tight text-eggshell">ExpoGain</h1>
+        <p className="mt-1 text-[11px] text-eggshell/65">Interactive curve overlays</p>
       </header>
 
-      <div className="mt-3.5 h-px bg-white/20" />
+      <div className="mt-3.5 h-px bg-eggshell/20" />
 
       {/* Error display */}
       {error && (
-        <div className="mt-4 rounded-lg border border-red-300/30 bg-red-500/20 p-2.5">
-          <div className="text-[10px] font-medium uppercase tracking-wide text-red-200">Error</div>
-          <div className="mt-1 text-xs leading-snug text-red-50">{error}</div>
+        <div className="mt-4 rounded-lg border border-burnt-peach/45 bg-burnt-peach/15 p-2.5">
+          <div className="text-[10px] font-medium uppercase tracking-wide text-apricot">Error</div>
+          <div className="mt-1 text-xs leading-snug text-eggshell">{error}</div>
         </div>
       )}
 
@@ -224,10 +224,10 @@ function App() {
         disabled={isInjected || status === 'Starting...' || status === 'Finding active tab...' || status === 'Injecting script...'}
         className={`group mt-5 flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-3.5 text-[15px] font-semibold transition-all duration-200 ${
           isInjected
-            ? 'cursor-not-allowed bg-emerald-400 text-emerald-950 shadow-lg shadow-emerald-900/25'
+            ? 'cursor-not-allowed bg-muted-teal text-twilight shadow-lg shadow-twilight/40'
             : isInjecting
-            ? 'cursor-not-allowed bg-white/25 text-white'
-            : 'bg-white text-blue-600 shadow-lg shadow-blue-900/30 hover:shadow-xl hover:shadow-blue-900/40 hover:brightness-105 active:scale-[0.98]'
+            ? 'cursor-not-allowed bg-eggshell/20 text-eggshell'
+            : 'bg-burnt-peach text-eggshell shadow-lg shadow-twilight/50 hover:shadow-xl hover:brightness-105 active:scale-[0.98]'
         }`}
       >
         {isInjected ? '✓ Injected!' :
@@ -244,10 +244,10 @@ function App() {
         disabled={status === 'Taking screenshot...' || status === 'Capturing visible tab...'}
         className={`mt-3 w-full py-1.5 text-center text-xs transition-colors duration-200 ${
           status === 'Screenshot saved!'
-            ? 'cursor-not-allowed text-emerald-200'
+            ? 'cursor-not-allowed text-muted-teal'
             : isCapturing
-            ? 'cursor-not-allowed text-yellow-100'
-            : 'text-white/75 underline-offset-4 hover:text-white hover:underline'
+            ? 'cursor-not-allowed text-apricot'
+            : 'text-eggshell/70 underline-offset-4 hover:text-eggshell hover:underline'
         }`}
       >
         {status === 'Screenshot saved!' ? '✓ Screenshot Saved!' :
@@ -256,16 +256,16 @@ function App() {
       </button>
 
       {/* Status — demoted to a quiet footer line */}
-      <div className="mt-4 flex items-center gap-1.5 border-t border-white/15 pt-3">
+      <div className="mt-4 flex items-center gap-1.5 border-t border-eggshell/15 pt-3">
         <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${
-          status === 'Ready' ? 'bg-green-300' :
-          status === 'Failed' || status === 'Error' ? 'bg-red-300' :
-          'bg-yellow-300'
+          status === 'Ready' ? 'bg-muted-teal' :
+          status === 'Failed' || status === 'Error' ? 'bg-burnt-peach' :
+          'bg-apricot'
         }`} />
         <span className={`text-[10px] tracking-wide ${
-          status === 'Ready' ? 'text-green-200' :
-          status === 'Failed' || status === 'Error' ? 'text-red-200' :
-          'text-yellow-200'
+          status === 'Ready' ? 'text-muted-teal' :
+          status === 'Failed' || status === 'Error' ? 'text-burnt-peach' :
+          'text-apricot'
         }`}>
           {status}
         </span>

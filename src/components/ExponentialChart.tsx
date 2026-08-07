@@ -1,7 +1,49 @@
 import React, { useRef, useEffect, useState } from 'react'
+import { alpha, palette } from '../palette'
 
 interface ExponentialChartProps {
   onClose: () => void
+}
+
+// The container's border sits outside the padding box that absolutely
+// positioned children are laid out against, so every handle offset has to
+// compensate for it. Without this the whole set drifts inward by 2px.
+const BORDER_WIDTH = 2
+
+// Each handle pins the sides it belongs to at the border box, then pulls
+// itself back by half its own size — so it lands centred on its corner or
+// edge midpoint whatever the handle or border measures. The arrow is one
+// glyph rotated onto each axis, which keeps every direction rendering the
+// same way across fonts.
+const RESIZE_HANDLES = [
+  { direction: 'nw', cursor: 'nw-resize', top: -BORDER_WIDTH, left: -BORDER_WIDTH, shift: 'translate(-50%, -50%)', angle: 45 },
+  { direction: 'n', cursor: 'n-resize', top: -BORDER_WIDTH, left: '50%', shift: 'translate(-50%, -50%)', angle: 90 },
+  { direction: 'ne', cursor: 'ne-resize', top: -BORDER_WIDTH, right: -BORDER_WIDTH, shift: 'translate(50%, -50%)', angle: -45 },
+  { direction: 'e', cursor: 'e-resize', top: '50%', right: -BORDER_WIDTH, shift: 'translate(50%, -50%)', angle: 0 },
+  { direction: 'se', cursor: 'se-resize', bottom: -BORDER_WIDTH, right: -BORDER_WIDTH, shift: 'translate(50%, 50%)', angle: 45 },
+  { direction: 's', cursor: 's-resize', bottom: -BORDER_WIDTH, left: '50%', shift: 'translate(-50%, 50%)', angle: 90 },
+  { direction: 'sw', cursor: 'sw-resize', bottom: -BORDER_WIDTH, left: -BORDER_WIDTH, shift: 'translate(-50%, 50%)', angle: -45 },
+  { direction: 'w', cursor: 'w-resize', top: '50%', left: -BORDER_WIDTH, shift: 'translate(-50%, -50%)', angle: 0 },
+] as const
+
+const RESIZE_HANDLE_STYLE: React.CSSProperties = {
+  position: 'absolute',
+  boxSizing: 'border-box',
+  width: 20,
+  height: 20,
+  borderRadius: '50%',
+  border: `2px solid ${palette.mutedTeal}`,
+  backgroundColor: palette.eggshell,
+  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.28)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  fontSize: '11px',
+  lineHeight: 1,
+  color: palette.twilight,
+  fontFamily: 'system-ui, -apple-system, sans-serif',
+  userSelect: 'none',
+  zIndex: 2,
 }
 
 export const ExponentialChart: React.FC<ExponentialChartProps> = ({ onClose }) => {
@@ -59,7 +101,7 @@ export const ExponentialChart: React.FC<ExponentialChartProps> = ({ onClose }) =
 
     // Draw axes
     ctx.beginPath()
-    ctx.strokeStyle = '#666'
+    ctx.strokeStyle = palette.twilight
     ctx.lineWidth = 1
 
     // X-axis
@@ -75,7 +117,7 @@ export const ExponentialChart: React.FC<ExponentialChartProps> = ({ onClose }) =
 
     // Draw exponential curve
     ctx.beginPath()
-    ctx.strokeStyle = '#3B82F6'
+    ctx.strokeStyle = palette.burntPeach
     ctx.lineWidth = 2
 
     // Draw curve with more points for smoothness
@@ -95,7 +137,7 @@ export const ExponentialChart: React.FC<ExponentialChartProps> = ({ onClose }) =
     ctx.stroke()
 
     // Draw grid lines
-    ctx.strokeStyle = '#ddd'
+    ctx.strokeStyle = alpha(palette.twilight, 0.25)
     ctx.lineWidth = 0.5
     ctx.setLineDash([2, 2])
 
@@ -123,8 +165,8 @@ export const ExponentialChart: React.FC<ExponentialChartProps> = ({ onClose }) =
     ctx.setLineDash([])
 
     // Add numbers to axes
-    ctx.fillStyle = '#666'
-    ctx.font = '10px Arial'
+    ctx.fillStyle = palette.twilight
+    ctx.font = '10px system-ui, -apple-system, sans-serif'
     ctx.textAlign = 'center'
     ctx.textBaseline = 'top'
 
@@ -245,10 +287,12 @@ export const ExponentialChart: React.FC<ExponentialChartProps> = ({ onClose }) =
         top: position.y,
         width: size.width,
         height: size.height,
-        border: '2px solid #6b7280',
+        border: `${BORDER_WIDTH}px solid ${palette.mutedTeal}`,
         borderRadius: '12px',
         boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+        // Barely-there wash of eggshell — enough to read as a panel, still
+        // letting the page beneath show through
+        backgroundColor: alpha(palette.eggshell, 0.15),
         zIndex: 10000,
       }}
     >
@@ -264,8 +308,8 @@ export const ExponentialChart: React.FC<ExponentialChartProps> = ({ onClose }) =
           height: '32px',
           border: 'none',
           borderRadius: '6px',
-          backgroundColor: 'rgba(239, 68, 68, 0.9)',
-          color: 'white',
+          backgroundColor: palette.burntPeach,
+          color: palette.eggshell,
           fontSize: '16px',
           fontWeight: 'bold',
           cursor: 'pointer',
@@ -277,11 +321,11 @@ export const ExponentialChart: React.FC<ExponentialChartProps> = ({ onClose }) =
           boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 1)';
+          e.currentTarget.style.filter = 'brightness(1.08)';
           e.currentTarget.style.transform = 'scale(1.05)';
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.9)';
+          e.currentTarget.style.filter = 'none';
           e.currentTarget.style.transform = 'scale(1)';
         }}
       >
@@ -316,117 +360,23 @@ export const ExponentialChart: React.FC<ExponentialChartProps> = ({ onClose }) =
         onMouseDown={(e) => handleMouseDown(e, 'drag')}
       />
 
-      {/* Resize handles - corners */}
-      <div
-        style={{
-          position: 'absolute',
-          top: -6,
-          left: -6,
-          width: 12,
-          height: 12,
-          backgroundColor: '#4b5563',
-          borderRadius: '50%',
-          cursor: 'nw-resize',
-        }}
-        onMouseDown={(e) => handleMouseDown(e, 'resize-nw')}
-      />
-      <div
-        style={{
-          position: 'absolute',
-          top: -6,
-          right: -6,
-          width: 12,
-          height: 12,
-          backgroundColor: '#4b5563',
-          borderRadius: '50%',
-          cursor: 'ne-resize',
-        }}
-        onMouseDown={(e) => handleMouseDown(e, 'resize-ne')}
-      />
-      <div
-        style={{
-          position: 'absolute',
-          bottom: -6,
-          left: -6,
-          width: 12,
-          height: 12,
-          backgroundColor: '#4b5563',
-          borderRadius: '50%',
-          cursor: 'sw-resize',
-        }}
-        onMouseDown={(e) => handleMouseDown(e, 'resize-sw')}
-      />
-      <div
-        style={{
-          position: 'absolute',
-          bottom: -6,
-          right: -6,
-          width: 12,
-          height: 12,
-          backgroundColor: '#4b5563',
-          borderRadius: '50%',
-          cursor: 'se-resize',
-        }}
-        onMouseDown={(e) => handleMouseDown(e, 'resize-se')}
-      />
-
-      {/* Resize handles - edges */}
-      <div
-        style={{
-          position: 'absolute',
-          top: -4,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: 20,
-          height: 8,
-          backgroundColor: '#4b5563',
-          borderRadius: '4px',
-          cursor: 'n-resize',
-        }}
-        onMouseDown={(e) => handleMouseDown(e, 'resize-n')}
-      />
-      <div
-        style={{
-          position: 'absolute',
-          bottom: -4,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: 20,
-          height: 8,
-          backgroundColor: '#4b5563',
-          borderRadius: '4px',
-          cursor: 's-resize',
-        }}
-        onMouseDown={(e) => handleMouseDown(e, 'resize-s')}
-      />
-      <div
-        style={{
-          position: 'absolute',
-          left: -4,
-          top: '50%',
-          transform: 'translateY(-50%)',
-          width: 8,
-          height: 20,
-          backgroundColor: '#4b5563',
-          borderRadius: '4px',
-          cursor: 'w-resize',
-        }}
-        onMouseDown={(e) => handleMouseDown(e, 'resize-w')}
-      />
-      <div
-        style={{
-          position: 'absolute',
-          right: -4,
-          top: '50%',
-          transform: 'translateY(-50%)',
-          width: 8,
-          height: 20,
-          backgroundColor: '#4b5563',
-          borderRadius: '4px',
-          cursor: 'e-resize',
-        }}
-        onMouseDown={(e) => handleMouseDown(e, 'resize-e')}
-      />
+      {/* Resize handles — corners and edges, centred on the border box */}
+      {RESIZE_HANDLES.map(({ direction, cursor, shift, angle, ...offsets }) => (
+        <div
+          key={direction}
+          aria-hidden
+          title={`Resize ${direction}`}
+          style={{
+            ...RESIZE_HANDLE_STYLE,
+            ...offsets,
+            cursor,
+            transform: `${shift} rotate(${angle}deg)`,
+          }}
+          onMouseDown={(e) => handleMouseDown(e, `resize-${direction}`)}
+        >
+          ↔
+        </div>
+      ))}
     </div>
   )
 }
