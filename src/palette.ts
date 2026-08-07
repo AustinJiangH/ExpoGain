@@ -10,7 +10,7 @@
 export const palette = {
   /** Delicate neutral, chalky cream — the panel ground */
   eggshell: '#f4f1de',
-  /** Fiery and robust — the primary action and the curve itself */
+  /** Fiery and robust — the primary action and fault states */
   burntPeach: '#e07a5f',
   /** Twilight’s serene depth — the popup ground, axes and type */
   twilight: '#3d405b',
@@ -18,6 +18,8 @@ export const palette = {
   mutedTeal: '#81b29a',
   /** Creamy warmth — work in progress */
   apricot: '#f2cc8f',
+  /** The plotted curve. Reads clearly against both the panel and a host page */
+  curveBlue: '#3f72b8',
 } as const
 
 /** Palette colour at partial alpha, for grid lines and tinted panels */
